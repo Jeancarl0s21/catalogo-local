@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Catálogo Local
 
-## Getting Started
+Catálogo Local é um MVP de SaaS simples para pequenos comércios criarem uma vitrine digital pública com produtos, categorias, preços e botão de compra pelo WhatsApp.
 
-First, run the development server:
+A versão atual usa uma loja de perfumes apenas como demonstração inicial, mas o produto foi pensado para servir diferentes tipos de negócios locais, como lojas de roupa, variedades, presentes, cosméticos e outros comércios que vendem pelo WhatsApp.
+
+## Objetivo do MVP
+
+Validar a experiência principal de um lojista que precisa organizar seus produtos em uma página pública simples, mais fácil de compartilhar do que um perfil de Instagram usado como catálogo.
+
+Fluxo principal:
+
+1. O lojista configura dados básicos da loja.
+2. O lojista cadastra e organiza produtos.
+3. O cliente acessa a página pública da loja.
+4. O cliente busca ou filtra produtos.
+5. O cliente clica em comprar pelo WhatsApp.
+6. O WhatsApp abre com uma mensagem pronta sobre o produto escolhido.
+
+## Funcionalidades atuais
+
+- Página inicial apresentando o produto.
+- Página pública da loja demo em `/loja/demo`.
+- Busca por nome na vitrine pública.
+- Filtro por categoria na vitrine pública.
+- Cards de produto com imagem visual mockada, categoria, preço e descrição.
+- Botão de compra pelo WhatsApp com mensagem automática.
+- Dashboard mockado do lojista.
+- Tela de produtos com busca, filtros rápidos e ações visuais.
+- Cadastro, edição, pausa/ativação e remoção temporária de produtos em estado local.
+- Tela de configurações da loja organizada em seções.
+- Configuração visual mockada de dados da loja, link público, WhatsApp, mensagem automática e aparência da vitrine.
+
+## Tecnologias usadas
+
+- Next.js
+- TypeScript
+- React
+- Tailwind CSS
+- ESLint
+
+## Como rodar localmente
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Rode o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse no navegador:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Rode a verificação de lint:
 
-## Learn More
+```bash
+npm run lint
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Rotas principais
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/` - apresentação do produto.
+- `/loja/demo` - vitrine pública da loja demo.
+- `/dashboard` - resumo do lojista.
+- `/dashboard/produtos` - gerenciamento visual de produtos.
+- `/dashboard/configuracoes` - configurações mockadas da loja.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Dados mockados
 
-## Deploy on Vercel
+Esta versão ainda não usa banco de dados, Supabase, login real ou APIs.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Os produtos, dados da loja e configurações são mockados para validar a interface e o fluxo do MVP. Algumas ações do dashboard funcionam apenas em estado local durante a sessão, sem persistência permanente.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Próximos passos planejados
+
+- Integrar autenticação do lojista.
+- Persistir dados da loja e produtos no Supabase.
+- Salvar configurações reais de WhatsApp, slug e aparência.
+- Permitir upload real de imagens de produtos.
+- Preparar deploy na Vercel.
+- Melhorar validações de formulário.
+- Evoluir a vitrine para diferentes segmentos de pequenos comércios.

@@ -1,10 +1,13 @@
-import { store } from "../../lib/mock-data";
+import { getDashboardData } from "../dashboard-data";
 
-const whatsappMessage =
+const defaultWhatsappMessage =
   "Olá! Tenho interesse no produto: {{nome_do_produto}}. Ainda está disponível?";
 
-export default function DashboardSettingsPage() {
-  const publicLink = `/loja/${store.slug}`;
+export const dynamic = "force-dynamic";
+
+export default async function DashboardSettingsPage() {
+  const { store } = await getDashboardData();
+  const publicLink = store ? `/loja/${store.slug}` : "/loja/demo";
 
   return (
     <div className="space-y-6">
@@ -12,10 +15,20 @@ export default function DashboardSettingsPage() {
         <p className="text-sm font-semibold text-teal-700">Loja</p>
         <h1 className="text-3xl font-bold text-zinc-950">Configurações</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
-          Ajuste como a loja aparece para os clientes. Nesta versão demo, as alterações
-          ainda não são salvas de forma permanente.
+          Confira como a loja aparece para os clientes. Os campos já carregam dados reais
+          do Supabase, mas o salvamento será implementado na próxima etapa.
         </p>
       </section>
+
+      {!store ? (
+        <section className="rounded-lg border border-amber-200 bg-amber-50 p-4 shadow-sm">
+          <h2 className="text-lg font-bold text-amber-950">Nenhuma loja encontrada</h2>
+          <p className="mt-2 text-sm leading-6 text-amber-900">
+            Crie manualmente uma loja em `stores` com `owner_id` igual ao usuário logado
+            para preencher esta tela com dados reais.
+          </p>
+        </section>
+      ) : null}
 
       <form className="space-y-4">
         <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
@@ -25,18 +38,20 @@ export default function DashboardSettingsPage() {
               Nome da loja
               <input
                 className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-                defaultValue={store.name}
+                defaultValue={store?.name ?? ""}
                 id="name"
+                placeholder="Nome da loja"
                 type="text"
               />
             </label>
 
-            <label className="block text-sm font-bold text-zinc-800" htmlFor="main-category">
-              Categoria principal do comércio
+            <label className="block text-sm font-bold text-zinc-800" htmlFor="business-type">
+              Tipo de comércio
               <input
                 className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-                defaultValue="Perfumaria"
-                id="main-category"
+                defaultValue={store?.business_type ?? ""}
+                id="business-type"
+                placeholder="Ex.: roupas, variedades, perfumaria"
                 type="text"
               />
             </label>
@@ -46,8 +61,9 @@ export default function DashboardSettingsPage() {
             Descrição curta
             <textarea
               className="mt-2 min-h-28 w-full rounded-lg border border-zinc-300 px-4 py-3 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-              defaultValue={store.description}
+              defaultValue={store?.description ?? ""}
               id="description"
+              placeholder="Resumo da loja para a vitrine pública"
             />
           </label>
         </section>
@@ -63,8 +79,9 @@ export default function DashboardSettingsPage() {
               Slug público
               <input
                 className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-                defaultValue={store.slug}
+                defaultValue={store?.slug ?? ""}
                 id="slug"
+                placeholder="minha-loja"
                 type="text"
               />
             </label>
@@ -94,8 +111,9 @@ export default function DashboardSettingsPage() {
             Número do WhatsApp
             <input
               className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-              defaultValue={store.whatsapp}
+              defaultValue={store?.whatsapp ?? ""}
               id="whatsapp"
+              placeholder="5581999999999"
               type="tel"
             />
           </label>
@@ -112,52 +130,75 @@ export default function DashboardSettingsPage() {
             Texto padrão da mensagem
             <textarea
               className="mt-2 min-h-28 w-full rounded-lg border border-zinc-300 px-4 py-3 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-              defaultValue={whatsappMessage}
+              defaultValue={store?.whatsapp_message_template ?? defaultWhatsappMessage}
               id="message"
             />
           </label>
         </section>
 
-        {/* <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+        <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <h2 className="text-lg font-bold text-zinc-950">Aparência da vitrine</h2>
           <p className="mt-1 text-sm leading-6 text-zinc-600">
-            Campos visuais para representar futuras opções de personalização.
+            Estes campos já refletem o banco, mas upload e validações visuais ficam para
+            uma etapa futura.
           </p>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-bold text-zinc-800" htmlFor="color">
-              Nome da cor principal
+            <label className="block text-sm font-bold text-zinc-800" htmlFor="primary-color">
+              Cor principal
               <input
                 className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-                defaultValue="Verde elegante"
-                id="color"
+                defaultValue={store?.primary_color ?? ""}
+                id="primary-color"
+                placeholder="#0f766e"
                 type="text"
               />
             </label>
 
-            <div className="rounded-lg border border-zinc-200 bg-stone-50 p-4">
-              <p className="text-sm font-bold text-zinc-800">Logo da loja</p>
-              <div className="mt-3 flex h-24 items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-white text-sm font-semibold text-zinc-500">
-                Placeholder de logo
-              </div>
-            </div>
+            <label className="block text-sm font-bold text-zinc-800" htmlFor="status">
+              Status da loja
+              <input
+                className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+                defaultValue={store?.is_active ? "Ativa" : "Inativa"}
+                id="status"
+                readOnly
+                type="text"
+              />
+            </label>
           </div>
 
-          <div className="mt-4 rounded-lg border border-zinc-200 bg-stone-50 p-4">
-            <p className="text-sm font-bold text-zinc-800">Banner da loja</p>
-            <div className="mt-3 flex h-32 items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-[linear-gradient(135deg,#0f766e,#f59e0b)] text-sm font-bold text-white">
-              Placeholder de banner
-            </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-bold text-zinc-800" htmlFor="logo-url">
+              URL da logo
+              <input
+                className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+                defaultValue={store?.logo_url ?? ""}
+                id="logo-url"
+                placeholder="https://..."
+                type="url"
+              />
+            </label>
+
+            <label className="block text-sm font-bold text-zinc-800" htmlFor="banner-url">
+              URL do banner
+              <input
+                className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+                defaultValue={store?.banner_url ?? ""}
+                id="banner-url"
+                placeholder="https://..."
+                type="url"
+              />
+            </label>
           </div>
-        </section> */}
+        </section>
 
         <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <p className="mb-3 text-sm leading-6 text-zinc-600">
-            Nesta versão demo, o botão abaixo é apenas visual. A persistência real virá em
-            uma etapa futura.
+            Os campos acima são carregados do Supabase. O botão abaixo ainda é apenas
+            visual; o salvamento real será implementado na próxima etapa.
           </p>
           <button
-            className="h-11 w-full rounded-lg bg-teal-800 px-4 text-sm font-bold text-white sm:w-auto"
+            className="h-11 w-full rounded-lg bg-teal-800 px-4 text-sm font-bold text-white opacity-80 sm:w-auto"
             type="button"
           >
             Salvar alterações

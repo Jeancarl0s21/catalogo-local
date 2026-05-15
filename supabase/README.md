@@ -18,7 +18,7 @@ Nesta etapa, o projeto ainda nao integra o app Next.js com Supabase. O arquivo `
    - `products`
 7. Confira em **Authentication > Policies** se o RLS esta ativo e se as policies foram criadas.
 
-## Como Configurar Storage
+## Como Configurar Storage De Produtos
 
 Para upload real de imagens de produtos, crie manualmente um bucket publico no Supabase:
 
@@ -44,6 +44,32 @@ Regras atuais do app:
 - a proporcao 1:1 ainda nao e obrigatoria;
 - as policies do Storage validam o usuario autenticado pelo primeiro segmento do caminho;
 - upload de logo e banner ainda nao foi implementado.
+
+## Como Configurar Storage Da Loja
+
+Para upload real da logo da loja, crie manualmente um bucket publico no Supabase:
+
+1. Acesse **Storage**.
+2. Clique em **New bucket**.
+3. Use o nome `store-assets`.
+4. Marque o bucket como **Public**.
+5. Crie o bucket.
+6. Abra **SQL Editor**.
+7. Copie e execute o arquivo `supabase/store-assets-policies.sql`.
+
+O app salva logos no caminho:
+
+```text
+{auth_user_id}/{store_id}/logo/{timestamp-ou-uuid}-{nome-do-arquivo}
+```
+
+Regras atuais para logo da loja:
+
+- formatos aceitos: JPG, PNG e WEBP;
+- tamanho maximo: 2 MB;
+- recomendacao visual: imagem quadrada 1:1;
+- as policies do Storage validam o usuario autenticado pelo primeiro segmento do caminho;
+- upload de banner ainda nao foi implementado.
 
 ## O Que Cada Tabela Faz
 

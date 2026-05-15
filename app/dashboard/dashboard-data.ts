@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "../lib/supabase/server";
 
 export type DashboardStore = {
   id: string;
+  owner_id: string;
   name: string;
   slug: string;
   business_type: string | null;
@@ -53,7 +54,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const { data: store } = await supabase
     .from("stores")
     .select(
-      "id, name, slug, business_type, description, whatsapp, is_active, logo_url, banner_url, primary_color, whatsapp_message_template",
+      "id, owner_id, name, slug, business_type, description, whatsapp, is_active, logo_url, banner_url, primary_color, whatsapp_message_template",
     )
     .eq("owner_id", user.id)
     .maybeSingle<DashboardStore>();

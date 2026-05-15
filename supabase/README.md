@@ -33,7 +33,7 @@ Para upload real de imagens de produtos, crie manualmente um bucket publico no S
 O app salva imagens no caminho:
 
 ```text
-{store_id}/{timestamp-ou-uuid}-{nome-do-arquivo}
+{auth_user_id}/{store_id}/{timestamp-ou-uuid}-{nome-do-arquivo}
 ```
 
 Regras atuais do app:
@@ -42,6 +42,7 @@ Regras atuais do app:
 - tamanho maximo: 2 MB;
 - recomendacao visual: imagem quadrada 1:1;
 - a proporcao 1:1 ainda nao e obrigatoria;
+- as policies do Storage validam o usuario autenticado pelo primeiro segmento do caminho;
 - upload de logo e banner ainda nao foi implementado.
 
 ## O Que Cada Tabela Faz

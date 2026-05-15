@@ -15,12 +15,7 @@ for insert
 to authenticated
 with check (
   bucket_id = 'product-images'
-  and exists (
-    select 1
-    from public.stores
-    where stores.id::text = (storage.foldername(name))[1]
-      and stores.owner_id = auth.uid()
-  )
+  and auth.uid()::text = (storage.foldername(name))[1]
 );
 
 drop policy if exists "Store owners can update product images" on storage.objects;
@@ -30,21 +25,11 @@ for update
 to authenticated
 using (
   bucket_id = 'product-images'
-  and exists (
-    select 1
-    from public.stores
-    where stores.id::text = (storage.foldername(name))[1]
-      and stores.owner_id = auth.uid()
-  )
+  and auth.uid()::text = (storage.foldername(name))[1]
 )
 with check (
   bucket_id = 'product-images'
-  and exists (
-    select 1
-    from public.stores
-    where stores.id::text = (storage.foldername(name))[1]
-      and stores.owner_id = auth.uid()
-  )
+  and auth.uid()::text = (storage.foldername(name))[1]
 );
 
 drop policy if exists "Store owners can delete product images" on storage.objects;
@@ -54,10 +39,5 @@ for delete
 to authenticated
 using (
   bucket_id = 'product-images'
-  and exists (
-    select 1
-    from public.stores
-    where stores.id::text = (storage.foldername(name))[1]
-      and stores.owner_id = auth.uid()
-  )
+  and auth.uid()::text = (storage.foldername(name))[1]
 );

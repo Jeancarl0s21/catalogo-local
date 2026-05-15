@@ -148,11 +148,11 @@ function getFileExtension(file: File) {
   return "jpg";
 }
 
-function buildImagePath(storeId: string, file: File, productName: string) {
+function buildImagePath(authUserId: string, storeId: string, file: File, productName: string) {
   const extension = getFileExtension(file);
   const baseName = slugify(productName || file.name.replace(/\.[^.]+$/, "")) || "produto";
 
-  return `${storeId}/${Date.now()}-${baseName}.${extension}`;
+  return `${authUserId}/${storeId}/${Date.now()}-${baseName}.${extension}`;
 }
 
 export function ProductsManager({ store, categories, initialProducts }: ProductsManagerProps) {
@@ -305,7 +305,6 @@ export function ProductsManager({ store, categories, initialProducts }: Products
         return;
       }
 
-      const imagePath = buildImagePath(store.id, selectedImageFile, cleanName);
       const {
         data: { session },
         error: sessionError,
@@ -316,19 +315,15 @@ export function ProductsManager({ store, categories, initialProducts }: Products
       } = await supabase.auth.getUser();
       const authUserId = user?.id ?? session?.user.id ?? null;
 
-      console.info("Product image upload auth check", {
-        hasSession: Boolean(session),
-        authUserId,
-        storeId: store.id,
-        storeOwnerId: store.owner_id,
-        ownerMatchesUser: Boolean(authUserId && store.owner_id === authUserId),
-        bucket: productImagesBucket,
-        path: imagePath,
-      });
-
       if (sessionError || userError || !session || !authUserId) {
         setIsSubmitting(false);
         setFeedback({ type: "error", text: "Sua sessao expirou. Entre novamente para enviar imagens." });
+        return;
+      }
+
+      if (!store.owner_id) {
+        setIsSubmitting(false);
+        setFeedback({ type: "error", text: "Nao foi possivel identificar o dono da loja." });
         return;
       }
 
@@ -337,6 +332,18 @@ export function ProductsManager({ store, categories, initialProducts }: Products
         setFeedback({ type: "error", text: "A loja carregada nao pertence ao usuario logado." });
         return;
       }
+
+      const imagePath = buildImagePath(authUserId, store.id, selectedImageFile, cleanName);
+
+      console.info("Product image upload auth check", {
+        hasSession: Boolean(session),
+        authUserId,
+        storeId: store.id,
+        storeOwnerId: store.owner_id,
+        ownerMatchesUser: store.owner_id === authUserId,
+        bucket: productImagesBucket,
+        path: imagePath,
+      });
 
       const { error: uploadError } = await supabase.storage
         .from(productImagesBucket)

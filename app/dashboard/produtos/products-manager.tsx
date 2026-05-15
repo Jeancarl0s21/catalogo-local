@@ -1,9 +1,12 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "../../lib/supabase/browser";
 
 const filters = ["Todos", "Ativos", "Inativos", "Destaques"] as const;
+const productImagesBucket = "product-images";
+const maxImageSize = 2 * 1024 * 1024;
+const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
 const placeholderStyles = [
   {
@@ -56,7 +59,6 @@ type ProductForm = {
   slug: string;
   categoryId: string;
   price: string;
-  imageUrl: string;
   description: string;
   isFeatured: boolean;
   isActive: boolean;
@@ -73,7 +75,6 @@ const emptyForm: ProductForm = {
   slug: "",
   categoryId: "",
   price: "",
-  imageUrl: "",
   description: "",
   isFeatured: false,
   isActive: true,
@@ -122,11 +123,38 @@ function productToForm(product: StoreProduct): ProductForm {
     slug: product.slug,
     categoryId: product.category_id ?? "",
     price: product.price === null ? "" : String(product.price).replace(".", ","),
-    imageUrl: product.image_url ?? "",
     description: product.description ?? "",
     isFeatured: product.is_featured,
     isActive: product.is_active,
   };
+}
+
+function getFileExtension(file: File) {
+  const extensionFromName = file.name.split(".").pop()?.toLowerCase();
+
+  if (extensionFromName && ["jpg", "jpeg", "png", "webp"].includes(extensionFromName)) {
+    return extensionFromName === "jpeg" ? "jpg" : extensionFromName;
+  }
+
+  if (file.type === "image/png") {
+    return "png";
+  }
+
+  if (file.type === "image/webp") {
+    return "webp";
+  }
+
+  return "jpg";
+}
+
+function buildImagePath(storeId: string, file: File, productName: string) {
+  const extension = getFileExtension(file);
+  const baseName = slugify(productName || file.name.replace(/\.[^.]+$/, "")) || "produto";
+  const uniqueId = typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : String(Date.now());
+
+  return `${storeId}/${Date.now()}-${uniqueId}-${baseName}.${extension}`;
 }
 
 export function ProductsManager({ store, categories, initialProducts }: ProductsManagerProps) {
@@ -136,6 +164,8 @@ export function ProductsManager({ store, categories, initialProducts }: Products
   const [form, setForm] = useState<ProductForm>(emptyForm);
   const [editingProduct, setEditingProduct] = useState<StoreProduct | null>(null);
   const [productToRemove, setProductToRemove] = useState<StoreProduct | null>(null);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actionProductId, setActionProductId] = useState<string | null>(null);
@@ -147,6 +177,14 @@ export function ProductsManager({ store, categories, initialProducts }: Products
     () => new Map(categories.map((category) => [category.id, category.name])),
     [categories],
   );
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -173,6 +211,8 @@ export function ProductsManager({ store, categories, initialProducts }: Products
     setFeedback(null);
     setEditingProduct(null);
     setForm(emptyForm);
+    setSelectedImageFile(null);
+    setImagePreviewUrl(null);
     setIsModalOpen(true);
   }
 
@@ -180,14 +220,56 @@ export function ProductsManager({ store, categories, initialProducts }: Products
     setFeedback(null);
     setEditingProduct(product);
     setForm(productToForm(product));
+    setSelectedImageFile(null);
+    setImagePreviewUrl(product.image_url);
     setIsModalOpen(true);
   }
 
   function closeModal() {
+    if (imagePreviewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
     setIsModalOpen(false);
     setEditingProduct(null);
     setForm(emptyForm);
+    setSelectedImageFile(null);
+    setImagePreviewUrl(null);
     setIsSubmitting(false);
+  }
+
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) {
+      setSelectedImageFile(null);
+      setImagePreviewUrl(editingProduct?.image_url ?? null);
+      return;
+    }
+
+    if (!allowedImageTypes.includes(file.type)) {
+      event.target.value = "";
+      setSelectedImageFile(null);
+      setImagePreviewUrl(editingProduct?.image_url ?? null);
+      setFeedback({ type: "error", text: "Use uma imagem em JPG, PNG ou WEBP." });
+      return;
+    }
+
+    if (file.size > maxImageSize) {
+      event.target.value = "";
+      setSelectedImageFile(null);
+      setImagePreviewUrl(editingProduct?.image_url ?? null);
+      setFeedback({ type: "error", text: "A imagem deve ter no maximo 2 MB." });
+      return;
+    }
+
+    if (imagePreviewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    setFeedback(null);
+    setSelectedImageFile(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
   }
 
   async function saveProduct(event: FormEvent<HTMLFormElement>) {
@@ -216,13 +298,38 @@ export function ProductsManager({ store, categories, initialProducts }: Products
 
     setIsSubmitting(true);
 
+    let nextImageUrl = editingProduct?.image_url ?? null;
+
+    if (selectedImageFile) {
+      const imagePath = buildImagePath(store.id, selectedImageFile, cleanName);
+      const { error: uploadError } = await supabase.storage
+        .from(productImagesBucket)
+        .upload(imagePath, selectedImageFile, {
+          cacheControl: "3600",
+          contentType: selectedImageFile.type,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        setIsSubmitting(false);
+        setFeedback({ type: "error", text: "Nao foi possivel enviar a imagem." });
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from(productImagesBucket)
+        .getPublicUrl(imagePath);
+
+      nextImageUrl = publicUrlData.publicUrl;
+    }
+
     const productData = {
       name: cleanName,
       slug: cleanSlug,
       description: form.description.trim() || null,
       price: parsePrice(form.price),
       category_id: form.categoryId || null,
-      image_url: form.imageUrl.trim() || null,
+      image_url: nextImageUrl,
       is_active: form.isActive,
       is_featured: form.isFeatured,
     };
@@ -592,16 +699,30 @@ export function ProductsManager({ store, categories, initialProducts }: Products
               </label>
             </div>
 
-            <label className="mt-4 block text-sm font-bold text-zinc-800">
-              URL da imagem
+            <div className="mt-4 rounded-lg border border-zinc-200 bg-stone-50 p-3">
+              <label className="block text-sm font-bold text-zinc-800" htmlFor="product-image">
+                Imagem do produto
+              </label>
+              <p className="mt-1 text-xs leading-5 text-zinc-600">
+                Recomendado: imagem quadrada, até 2 MB, em JPG, PNG ou WEBP.
+              </p>
               <input
-                className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 text-base font-normal outline-none focus:border-teal-800 focus:ring-2 focus:ring-teal-100"
-                onChange={(event) => setForm({ ...form, imageUrl: event.target.value })}
-                placeholder="https://..."
-                type="url"
-                value={form.imageUrl}
+                accept="image/jpeg,image/png,image/webp"
+                className="mt-3 block w-full cursor-pointer rounded-lg border border-zinc-300 bg-white text-sm text-zinc-700 file:mr-4 file:h-11 file:cursor-pointer file:border-0 file:bg-teal-800 file:px-4 file:text-sm file:font-bold file:text-white hover:border-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
+                id="product-image"
+                onChange={handleImageChange}
+                type="file"
               />
-            </label>
+              {selectedImageFile ? (
+                <p className="mt-2 text-xs font-semibold text-zinc-600">
+                  Selecionado: {selectedImageFile.name}
+                </p>
+              ) : editingProduct?.image_url ? (
+                <p className="mt-2 text-xs font-semibold text-zinc-600">
+                  Imagem atual será mantida se nenhuma nova imagem for escolhida.
+                </p>
+              ) : null}
+            </div>
 
             <label className="mt-4 block text-sm font-bold text-zinc-800">
               Descrição curta
@@ -614,12 +735,12 @@ export function ProductsManager({ store, categories, initialProducts }: Products
 
             <div className="mt-4 grid gap-3 sm:grid-cols-[180px_1fr] sm:items-center">
               <div className="flex h-32 items-center justify-center overflow-hidden rounded-lg bg-stone-100">
-                {form.imageUrl ? (
+                {imagePreviewUrl ? (
                   <div
                     aria-label="Prévia da imagem"
                     className="h-full w-full bg-cover bg-center"
                     role="img"
-                    style={{ backgroundImage: `url(${form.imageUrl})` }}
+                    style={{ backgroundImage: `url(${imagePreviewUrl})` }}
                   />
                 ) : (
                   <div className="h-20 w-14 rounded-b-xl rounded-t-md border-2 border-teal-300 bg-teal-200 shadow-md" />

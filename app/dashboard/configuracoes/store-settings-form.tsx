@@ -1,7 +1,8 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
-import { DashboardStore } from "../dashboard-data";
+import { useRouter } from "next/navigation";
+import type { DashboardStore } from "../dashboard-data";
 import { createBrowserSupabaseClient } from "../../lib/supabase/browser";
 
 const storeAssetsBucket = "store-assets";
@@ -114,6 +115,7 @@ function isDuplicateSlugError(message?: string, code?: string) {
 }
 
 export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState<StoreForm>(() => storeToForm(store));
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(store?.logo_url ?? null);
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
@@ -239,6 +241,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     }
 
     let nextLogoUrl = currentLogoUrl;
+    let didUploadNewLogo = false;
 
     if (selectedLogoFile) {
       const logoPath = buildLogoPath(authUserId, store.id, selectedLogoFile, cleanName);
@@ -266,6 +269,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         .getPublicUrl(logoPath);
 
       nextLogoUrl = publicUrlData.publicUrl;
+      didUploadNewLogo = true;
     }
 
     const { data, error } = await supabase
@@ -296,7 +300,12 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         return;
       }
 
-      setFeedback({ type: "error", text: "Nao foi possivel salvar as configuracoes." });
+      setFeedback({
+        type: "error",
+        text: didUploadNewLogo
+          ? "A logo foi enviada, mas nao foi possivel atualizar os dados da loja."
+          : "Nao foi possivel salvar as configuracoes.",
+      });
       return;
     }
 
@@ -308,6 +317,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     setCurrentLogoUrl(data.logo_url);
     setLogoPreviewUrl(data.logo_url);
     setSelectedLogoFile(null);
+    router.refresh();
     setFeedback({ type: "success", text: "Configuracoes salvas com sucesso." });
   }
 

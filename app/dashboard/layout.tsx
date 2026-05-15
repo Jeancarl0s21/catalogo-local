@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignOutButton } from "./sign-out-button";
 
 const links = [
   { href: "/dashboard", label: "Resumo" },
@@ -30,6 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {link.label}
               </Link>
             ))}
+            <SignOutButton />
           </nav>
         </div>
       </header>

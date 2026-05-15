@@ -189,7 +189,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     setFeedback(null);
 
     if (!store) {
-      setFeedback({ type: "error", text: "Crie uma loja antes de salvar configuracoes." });
+      setFeedback({ type: "error", text: "Crie uma loja antes de salvar Configurações." });
       return;
     }
 
@@ -301,7 +301,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         type: "error",
         text: didUploadNewLogo
           ? "A logo foi enviada, mas nao foi possivel atualizar os dados da loja."
-          : "Nao foi possivel salvar as configuracoes.",
+          : "Nao foi possivel salvar as Configurações.",
       });
       return;
     }
@@ -315,14 +315,14 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     setLogoPreviewUrl(data.logo_url);
     setSelectedLogoFile(null);
     router.refresh();
-    setFeedback({ type: "success", text: "Configuracoes salvas com sucesso." });
+    setFeedback({ type: "success", text: "Configurações salvas com sucesso." });
   }
 
   return (
     <div className="space-y-6">
       <section>
         <p className="text-sm font-semibold text-teal-700">Loja</p>
-        <h1 className="text-3xl font-bold text-zinc-950">Configuracoes</h1>
+        <h1 className="text-3xl font-bold text-zinc-950">Configurações</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
           Atualize os dados reais da loja, o link publico, o WhatsApp e a logo exibida na
           vitrine.

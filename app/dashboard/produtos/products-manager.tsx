@@ -52,6 +52,7 @@ export type StoreProduct = {
 type StoreSummary = {
   id: string;
   name: string;
+  owner_id: string;
 };
 
 type ProductForm = {
@@ -150,11 +151,8 @@ function getFileExtension(file: File) {
 function buildImagePath(storeId: string, file: File, productName: string) {
   const extension = getFileExtension(file);
   const baseName = slugify(productName || file.name.replace(/\.[^.]+$/, "")) || "produto";
-  const uniqueId = typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : String(Date.now());
 
-  return `${storeId}/${Date.now()}-${uniqueId}-${baseName}.${extension}`;
+  return `${storeId}/${Date.now()}-${baseName}.${extension}`;
 }
 
 export function ProductsManager({ store, categories, initialProducts }: ProductsManagerProps) {
@@ -301,7 +299,45 @@ export function ProductsManager({ store, categories, initialProducts }: Products
     let nextImageUrl = editingProduct?.image_url ?? null;
 
     if (selectedImageFile) {
+      if (!store.id) {
+        setIsSubmitting(false);
+        setFeedback({ type: "error", text: "Nao foi possivel identificar a loja para enviar a imagem." });
+        return;
+      }
+
       const imagePath = buildImagePath(store.id, selectedImageFile, cleanName);
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      const authUserId = user?.id ?? session?.user.id ?? null;
+
+      console.info("Product image upload auth check", {
+        hasSession: Boolean(session),
+        authUserId,
+        storeId: store.id,
+        storeOwnerId: store.owner_id,
+        ownerMatchesUser: Boolean(authUserId && store.owner_id === authUserId),
+        bucket: productImagesBucket,
+        path: imagePath,
+      });
+
+      if (sessionError || userError || !session || !authUserId) {
+        setIsSubmitting(false);
+        setFeedback({ type: "error", text: "Sua sessao expirou. Entre novamente para enviar imagens." });
+        return;
+      }
+
+      if (store.owner_id !== authUserId) {
+        setIsSubmitting(false);
+        setFeedback({ type: "error", text: "A loja carregada nao pertence ao usuario logado." });
+        return;
+      }
+
       const { error: uploadError } = await supabase.storage
         .from(productImagesBucket)
         .upload(imagePath, selectedImageFile, {
@@ -311,6 +347,11 @@ export function ProductsManager({ store, categories, initialProducts }: Products
         });
 
       if (uploadError) {
+        console.error("Product image upload failed", {
+          message: uploadError.message,
+          bucket: productImagesBucket,
+          path: imagePath,
+        });
         setIsSubmitting(false);
         setFeedback({ type: "error", text: "Nao foi possivel enviar a imagem." });
         return;

@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 type StoreSummary = {
   id: string;
   name: string;
+  owner_id: string;
 };
 
 export default async function DashboardProductsPage() {
@@ -26,7 +27,7 @@ export default async function DashboardProductsPage() {
 
   const { data: store } = await supabase
     .from("stores")
-    .select("id, name")
+    .select("id, name, owner_id")
     .eq("owner_id", user.id)
     .maybeSingle<StoreSummary>();
 

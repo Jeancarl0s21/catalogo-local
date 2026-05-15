@@ -9,6 +9,7 @@ export type PublicStore = {
   description: string;
   whatsapp: string;
   whatsappMessageTemplate: string;
+  logoUrl?: string | null;
 };
 
 export type PublicProduct = {
@@ -36,6 +37,16 @@ function whatsappUrl(store: PublicStore, productName: string) {
   return `https://wa.me/${store.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
+function getStoreInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+}
+
 export function DemoStoreClient({ store, categories, products }: DemoStoreClientProps) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Todos");
@@ -55,48 +66,65 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
   }, [category, products, search]);
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] pb-8 text-zinc-950">
-      <section className="bg-teal-950 px-4 pb-10 pt-5 text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[#fbfaf7] text-zinc-950">
+      <section className="bg-teal-950 px-4 pb-12 pt-5 text-white sm:pb-14">
         <div className="mx-auto max-w-6xl">
-          <div className="flex items-center justify-between gap-4">
-            <Link className="text-sm font-semibold text-teal-50" href="/">
-              Voltar
-            </Link>
+          <div className="flex justify-end">
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-teal-50">
-              Catalogo demo
+              Catálogo online
             </span>
           </div>
 
-          <div className="mt-7 grid gap-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div className="space-y-4">
-              <p className="text-sm font-semibold text-teal-100">{store.segment}</p>
-              <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
-                {store.name}
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-teal-50">
-                {store.description}
-              </p>
+          <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start">
+              {/* Future upload should recommend square 1:1 logos, accept PNG/JPG/WEBP, and validate size/proportion while preserving object-fit. */}
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-white text-xl font-black text-teal-950 shadow-sm sm:h-24 sm:w-24">
+                {store.logoUrl ? (
+                  <div
+                    aria-label={`Logo ${store.name}`}
+                    className="h-full w-full bg-contain bg-center bg-no-repeat"
+                    role="img"
+                    style={{ backgroundImage: `url(${store.logoUrl})` }}
+                  />
+                ) : (
+                  <span>{getStoreInitials(store.name)}</span>
+                )}
+              </div>
+
+              <div className="min-w-0 space-y-4">
+                <p className="text-sm font-semibold text-teal-100">{store.segment}</p>
+                <h1 className="max-w-2xl break-words text-3xl font-bold leading-tight sm:text-5xl">
+                  {store.name}
+                </h1>
+                <p className="max-w-2xl text-sm leading-6 text-teal-50 sm:text-base sm:leading-7">
+                  {store.description}
+                </p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 rounded-lg border border-white/10 bg-white/10 p-3">
-              <div>
-                <strong className="block text-2xl">{activeProducts.length}</strong>
-                <span className="text-xs text-teal-50">Produtos cadastrados</span>
+            <div className="grid min-w-0 grid-cols-3 gap-2 rounded-lg border border-white/10 bg-white/10 p-3 sm:gap-3">
+              <div className="min-w-0">
+                <strong className="block text-xl sm:text-2xl">{activeProducts.length}</strong>
+                <span className="text-[11px] leading-4 text-teal-50 sm:text-xs">
+                  Produtos cadastrados
+                </span>
               </div>
-              <div>
-                <strong className="block text-2xl">{Math.max(categories.length - 1, 0)}</strong>
-                <span className="text-xs text-teal-50">Categorias</span>
+              <div className="min-w-0">
+                <strong className="block text-xl sm:text-2xl">
+                  {Math.max(categories.length - 1, 0)}
+                </strong>
+                <span className="text-[11px] leading-4 text-teal-50 sm:text-xs">Categorias</span>
               </div>
-              <div>
-                <strong className="block text-2xl">{featuredProducts}</strong>
-                <span className="text-xs text-teal-50">Destaques</span>
+              <div className="min-w-0">
+                <strong className="block text-xl sm:text-2xl">{featuredProducts}</strong>
+                <span className="text-[11px] leading-4 text-teal-50 sm:text-xs">Destaques</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto -mt-6 max-w-6xl px-4">
+      <section className="mx-auto -mt-7 max-w-6xl px-4">
         <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <label className="block text-sm font-bold text-zinc-800" htmlFor="search">
             Buscar produto
@@ -110,7 +138,7 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
             value={search}
           />
 
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          <div className="mt-4 flex max-w-full flex-wrap gap-2">
             {categories.map((item) => (
               <button
                 className={`h-10 shrink-0 rounded-lg border px-4 text-sm font-semibold transition ${
@@ -132,7 +160,7 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
       <section className="mx-auto mt-5 grid max-w-6xl gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3">
         {visibleProducts.map((product) => (
           <article
-            className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm"
+            className="min-w-0 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm"
             key={product.id}
           >
             <div className={`relative flex h-52 items-center justify-center ${product.imageClass}`}>
@@ -156,7 +184,7 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
               )}
 
               {product.category ? (
-                <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-teal-950 shadow-sm">
+                <div className="absolute left-4 top-4 max-w-[calc(100%-2rem)] rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-teal-950 shadow-sm">
                   {product.category}
                 </div>
               ) : null}
@@ -169,13 +197,13 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
             </div>
 
             <div className="flex min-h-64 flex-col p-4">
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 {product.category ? (
                   <p className="text-xs font-bold uppercase tracking-wide text-teal-800">
                     {product.category}
                   </p>
                 ) : null}
-                <h2 className="mt-1 text-lg font-bold leading-snug text-zinc-950">
+                <h2 className="mt-1 break-words text-lg font-bold leading-snug text-zinc-950">
                   {product.name}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-zinc-600">{product.description}</p>
@@ -184,7 +212,7 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
               <div className="mt-4">
                 <p className="text-2xl font-bold text-zinc-950">{product.price}</p>
                 <a
-                  className="mt-3 flex h-11 items-center justify-center rounded-lg bg-emerald-700 px-4 text-sm font-bold text-white transition hover:bg-emerald-800"
+                  className="mt-3 flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-4 py-2 text-center text-sm font-bold text-white transition hover:bg-emerald-800"
                   href={whatsappUrl(store, product.name)}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -205,6 +233,25 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
           </div>
         ) : null}
       </section>
+
+      <footer className="mx-auto mt-8 max-w-6xl px-4 pb-8">
+        <div className="flex flex-col gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-5 text-center shadow-sm sm:flex-row sm:items-center sm:justify-between sm:text-left">
+          <div>
+            <p className="text-sm font-bold text-zinc-900">
+              Catálogo criado com Catálogo Local
+            </p>
+            <p className="mt-1 text-sm text-zinc-600">
+              Uma vitrine simples para vender pelo WhatsApp.
+            </p>
+          </div>
+          <Link
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-300 px-4 text-sm font-bold text-zinc-800 transition hover:border-teal-700 hover:text-teal-800"
+            href="/"
+          >
+            Criar meu catálogo
+          </Link>
+        </div>
+      </footer>
     </main>
   );
 }

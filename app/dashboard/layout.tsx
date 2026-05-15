@@ -4,7 +4,7 @@ const links = [
   { href: "/dashboard", label: "Resumo" },
   { href: "/dashboard/produtos", label: "Produtos" },
   { href: "/dashboard/configuracoes", label: "Configurações" },
-  { href: "/loja/demo", label: "Loja demo" },
+  { href: "/loja/demo", label: "Ver loja" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <main className="min-h-screen bg-[#fbfaf7] text-zinc-950">
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <Link className="text-base font-bold text-zinc-950" href="/">
               Catálogo Local
             </Link>
@@ -20,10 +20,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               Demo
             </span>
           </div>
-          <nav className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          <nav className="mt-4 flex max-w-full flex-wrap gap-2">
             {links.map((link) => (
               <Link
-                className="shrink-0 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 shadow-sm"
+                className="shrink-0 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-teal-700 hover:text-teal-800"
                 href={link.href}
                 key={link.href}
               >

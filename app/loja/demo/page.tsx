@@ -12,6 +12,7 @@ type SupabaseStore = {
   name: string;
   description: string | null;
   business_type: string | null;
+  logo_url: string | null;
   whatsapp: string | null;
   whatsapp_message_template: string | null;
 };
@@ -84,6 +85,7 @@ function getMockStoreData(): DemoStoreData {
       description: mockStore.description,
       whatsapp: mockStore.whatsapp,
       whatsappMessageTemplate: defaultWhatsappMessage,
+      logoUrl: null,
     },
     categories: mockCategories,
     products: mockProducts,
@@ -99,7 +101,7 @@ async function getSupabaseStoreData(): Promise<DemoStoreData | null> {
 
   const { data: store, error: storeError } = await supabase
     .from("stores")
-    .select("id, name, description, business_type, whatsapp, whatsapp_message_template")
+    .select("id, name, description, business_type, logo_url, whatsapp, whatsapp_message_template")
     .eq("slug", "demo")
     .eq("is_active", true)
     .maybeSingle<SupabaseStore>();
@@ -140,6 +142,7 @@ async function getSupabaseStoreData(): Promise<DemoStoreData | null> {
       description: store.description ?? mockStore.description,
       whatsapp: store.whatsapp ?? mockStore.whatsapp,
       whatsappMessageTemplate: store.whatsapp_message_template ?? defaultWhatsappMessage,
+      logoUrl: store.logo_url,
     },
     categories: ["Todos", ...(categories as SupabaseCategory[]).map((category) => category.name)],
     products: (products as SupabaseProduct[]).map((product, index) => {

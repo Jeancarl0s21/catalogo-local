@@ -83,7 +83,7 @@ export function LoginForm() {
       ) : null}
 
       <button
-        className="flex h-12 w-full items-center justify-center rounded-lg bg-teal-800 px-4 text-sm font-bold text-white transition hover:bg-teal-900 disabled:cursor-not-allowed disabled:bg-zinc-400"
+        className="flex h-12 w-full cursor-pointer items-center justify-center rounded-lg bg-teal-800 px-4 text-sm font-bold text-white transition hover:bg-teal-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 disabled:cursor-not-allowed disabled:bg-zinc-400"
         disabled={isSubmitting}
         type="submit"
       >

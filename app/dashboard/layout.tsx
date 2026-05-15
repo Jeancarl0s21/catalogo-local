@@ -14,7 +14,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Link className="text-base font-bold text-zinc-950" href="/">
+            <Link
+              className="cursor-pointer text-base font-bold text-zinc-950 transition hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
+              href="/"
+            >
               Catálogo Local
             </Link>
             <span className="rounded-lg bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800">
@@ -24,7 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <nav className="mt-4 flex max-w-full flex-wrap gap-2">
             {links.map((link) => (
               <Link
-                className="shrink-0 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-teal-700 hover:text-teal-800"
+                className="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
                 href={link.href}
                 key={link.href}
               >

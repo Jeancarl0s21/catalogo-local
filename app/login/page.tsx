@@ -21,7 +21,10 @@ export default async function LoginPage() {
       <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center justify-center">
         <div className="grid w-full max-w-5xl overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm lg:grid-cols-[0.9fr_1.1fr]">
           <div className="bg-teal-950 p-6 text-white sm:p-8">
-            <Link className="text-base font-bold text-white" href="/">
+            <Link
+              className="cursor-pointer text-base font-bold text-white transition hover:text-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              href="/"
+            >
               Catalogo Local
             </Link>
             <div className="mt-12 space-y-4">

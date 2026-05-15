@@ -9,7 +9,7 @@ export default function Home() {
             Catálogo Local
           </span>
           <Link
-            className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 shadow-sm"
+            className="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
             href="/dashboard"
           >
             Entrar no painel
@@ -32,13 +32,13 @@ export default function Home() {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Link
-                className="flex h-12 items-center justify-center rounded-lg bg-teal-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-teal-900"
+                className="flex h-12 cursor-pointer items-center justify-center rounded-lg bg-teal-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-teal-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
                 href="/loja/demo"
               >
                 Ver loja demo
               </Link>
               <Link
-                className="flex h-12 items-center justify-center rounded-lg border border-zinc-300 bg-white px-5 text-sm font-bold text-zinc-900 transition hover:bg-zinc-50"
+                className="flex h-12 cursor-pointer items-center justify-center rounded-lg border border-zinc-300 bg-white px-5 text-sm font-bold text-zinc-900 transition hover:border-teal-700 hover:bg-zinc-50 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
                 href="/dashboard/produtos"
               >
                 Gerenciar produtos

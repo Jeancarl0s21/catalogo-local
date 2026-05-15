@@ -362,7 +362,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
           </p>
         </div>
         <button
-          className="h-11 rounded-lg bg-teal-800 px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-zinc-400"
+          className="h-11 cursor-pointer rounded-lg bg-teal-800 px-4 text-sm font-bold text-white transition hover:bg-teal-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 disabled:cursor-not-allowed disabled:bg-zinc-400"
           disabled={!store}
           onClick={openNewProductModal}
           type="button"
@@ -409,10 +409,10 @@ export function ProductsManager({ store, categories, initialProducts }: Products
         <div className="mt-4 flex flex-wrap gap-2">
           {filters.map((item) => (
             <button
-              className={`h-10 shrink-0 rounded-lg border px-4 text-sm font-semibold transition ${
+              className={`h-10 shrink-0 cursor-pointer rounded-lg border px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 ${
                 item === filter
                   ? "border-teal-800 bg-teal-800 text-white"
-                  : "border-zinc-300 bg-white text-zinc-700"
+                  : "border-zinc-300 bg-white text-zinc-700 hover:border-teal-700 hover:text-teal-800"
               }`}
               key={item}
               onClick={() => setFilter(item)}
@@ -482,14 +482,14 @@ export function ProductsManager({ store, categories, initialProducts }: Products
 
                 <div className="grid grid-cols-3 gap-2 lg:w-72">
                   <button
-                    className="h-10 rounded-lg border border-zinc-300 bg-white text-sm font-semibold text-zinc-800"
+                    className="h-10 cursor-pointer rounded-lg border border-zinc-300 bg-white text-sm font-semibold text-zinc-800 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
                     onClick={() => openEditProductModal(product)}
                     type="button"
                   >
                     Editar
                   </button>
                   <button
-                    className="h-10 rounded-lg border border-zinc-300 bg-white text-sm font-semibold text-zinc-800 disabled:cursor-not-allowed disabled:text-zinc-400"
+                    className="h-10 cursor-pointer rounded-lg border border-zinc-300 bg-white text-sm font-semibold text-zinc-800 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 disabled:cursor-not-allowed disabled:text-zinc-400"
                     disabled={actionProductId === product.id}
                     onClick={() => toggleProductStatus(product)}
                     type="button"
@@ -497,7 +497,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
                     {product.is_active ? "Pausar" : "Ativar"}
                   </button>
                   <button
-                    className="h-10 rounded-lg border border-red-200 bg-white text-sm font-semibold text-red-700"
+                    className="h-10 cursor-pointer rounded-lg border border-red-200 bg-white text-sm font-semibold text-red-700 transition hover:border-red-400 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-100"
                     onClick={() => setProductToRemove(product)}
                     type="button"
                   >
@@ -535,7 +535,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
                 </h2>
               </div>
               <button
-                className="rounded-lg border border-zinc-300 px-3 py-2 text-sm font-bold text-zinc-800"
+                className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-2 text-sm font-bold text-zinc-800 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
                 onClick={closeModal}
                 type="button"
               >
@@ -627,7 +627,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
               </div>
 
               <div className="space-y-3">
-                <label className="flex items-center gap-3 rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-800">
+                <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-800 transition hover:border-teal-700 hover:bg-teal-50/40">
                   <input
                     checked={form.isFeatured}
                     className="h-4 w-4 accent-teal-800"
@@ -638,7 +638,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
                   />
                   Produto em destaque
                 </label>
-                <label className="flex items-center gap-3 rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-800">
+                <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-800 transition hover:border-teal-700 hover:bg-teal-50/40">
                   <input
                     checked={form.isActive}
                     className="h-4 w-4 accent-teal-800"
@@ -652,7 +652,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <button
-                className="h-11 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900"
+                className="h-11 cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 disabled:cursor-not-allowed disabled:text-zinc-400"
                 disabled={isSubmitting}
                 onClick={closeModal}
                 type="button"
@@ -660,7 +660,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
                 Cancelar
               </button>
               <button
-                className="h-11 rounded-lg bg-teal-800 px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-zinc-400"
+                className="h-11 cursor-pointer rounded-lg bg-teal-800 px-4 text-sm font-bold text-white transition hover:bg-teal-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 disabled:cursor-not-allowed disabled:bg-zinc-400"
                 disabled={isSubmitting}
                 type="submit"
               >
@@ -683,7 +683,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <button
-                className="h-11 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900"
+                className="h-11 cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 disabled:cursor-not-allowed disabled:text-zinc-400"
                 disabled={actionProductId === productToRemove.id}
                 onClick={() => setProductToRemove(null)}
                 type="button"
@@ -691,7 +691,7 @@ export function ProductsManager({ store, categories, initialProducts }: Products
                 Cancelar
               </button>
               <button
-                className="h-11 rounded-lg bg-red-700 px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-zinc-400"
+                className="h-11 cursor-pointer rounded-lg bg-red-700 px-4 text-sm font-bold text-white transition hover:bg-red-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-100 disabled:cursor-not-allowed disabled:bg-zinc-400"
                 disabled={actionProductId === productToRemove.id}
                 onClick={removeProduct}
                 type="button"

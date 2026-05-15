@@ -113,19 +113,19 @@ export default async function DashboardPage() {
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <Link
-              className="flex h-11 items-center justify-center rounded-lg bg-teal-800 px-4 text-sm font-bold text-white"
+              className="flex h-11 cursor-pointer items-center justify-center rounded-lg bg-teal-800 px-4 text-sm font-bold text-white transition hover:bg-teal-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
               href={publicLink}
             >
               Abrir loja
             </Link>
             <button
-              className="h-11 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900"
+              className="h-11 cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
               type="button"
             >
               Copiar link
             </button>
             <Link
-              className="flex h-11 items-center justify-center rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900"
+              className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
               href="/dashboard/configuracoes"
             >
               Ver configurações
@@ -147,7 +147,10 @@ export default async function DashboardPage() {
         <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-lg font-bold text-zinc-950">Últimos produtos cadastrados</h2>
-            <Link className="text-sm font-bold text-teal-800" href="/dashboard/produtos">
+            <Link
+              className="cursor-pointer text-sm font-bold text-teal-800 transition hover:text-teal-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
+              href="/dashboard/produtos"
+            >
               Ver todos
             </Link>
           </div>
@@ -201,7 +204,7 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-bold text-zinc-950">Próximos passos</h2>
           <div className="mt-4 space-y-3">
             <Link
-              className="block rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-950"
+              className="block cursor-pointer rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-950 transition hover:border-teal-700 hover:bg-teal-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
               href="/dashboard/configuracoes"
             >
               Revisar dados da loja
@@ -210,7 +213,7 @@ export default async function DashboardPage() {
               </span>
             </Link>
             <Link
-              className="block rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-950"
+              className="block cursor-pointer rounded-lg border border-zinc-200 p-3 text-sm font-bold text-zinc-950 transition hover:border-teal-700 hover:bg-teal-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
               href="/dashboard/produtos"
             >
               Revisar produtos

@@ -86,7 +86,7 @@ export default async function DashboardSettingsPage() {
               />
             </label>
             <button
-              className="h-12 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900"
+              className="h-12 cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
               type="button"
             >
               Copiar link
@@ -198,7 +198,7 @@ export default async function DashboardSettingsPage() {
             visual; o salvamento real será implementado na próxima etapa.
           </p>
           <button
-            className="h-11 w-full rounded-lg bg-teal-800 px-4 text-sm font-bold text-white opacity-80 sm:w-auto"
+            className="h-11 w-full cursor-pointer rounded-lg bg-teal-800 px-4 text-sm font-bold text-white opacity-80 transition hover:bg-teal-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 sm:w-auto"
             type="button"
           >
             Salvar alterações

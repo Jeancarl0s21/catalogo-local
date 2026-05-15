@@ -141,10 +141,10 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
           <div className="mt-4 flex max-w-full flex-wrap gap-2">
             {categories.map((item) => (
               <button
-                className={`h-10 shrink-0 rounded-lg border px-4 text-sm font-semibold transition ${
+                className={`h-10 shrink-0 cursor-pointer rounded-lg border px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 ${
                   item === category
                     ? "border-teal-800 bg-teal-800 text-white"
-                    : "border-zinc-300 bg-white text-zinc-700"
+                    : "border-zinc-300 bg-white text-zinc-700 hover:border-teal-700 hover:text-teal-800"
                 }`}
                 key={item}
                 onClick={() => setCategory(item)}
@@ -212,7 +212,7 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
               <div className="mt-4">
                 <p className="text-2xl font-bold text-zinc-950">{product.price}</p>
                 <a
-                  className="mt-3 flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-4 py-2 text-center text-sm font-bold text-white transition hover:bg-emerald-800"
+                  className="mt-3 flex min-h-11 cursor-pointer items-center justify-center rounded-lg bg-emerald-700 px-4 py-2 text-center text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
                   href={whatsappUrl(store, product.name)}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -245,7 +245,7 @@ export function DemoStoreClient({ store, categories, products }: DemoStoreClient
             </p>
           </div>
           <Link
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-300 px-4 text-sm font-bold text-zinc-800 transition hover:border-teal-700 hover:text-teal-800"
+            className="inline-flex h-10 cursor-pointer items-center justify-center rounded-lg border border-zinc-300 px-4 text-sm font-bold text-zinc-800 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
             href="/"
           >
             Criar meu catálogo

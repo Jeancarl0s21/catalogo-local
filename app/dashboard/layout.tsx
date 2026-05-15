@@ -1,14 +1,16 @@
 import Link from "next/link";
+import { getDashboardData } from "./dashboard-data";
 import { SignOutButton } from "./sign-out-button";
 
-const links = [
-  { href: "/dashboard", label: "Resumo" },
-  { href: "/dashboard/produtos", label: "Produtos" },
-  { href: "/dashboard/configuracoes", label: "Configurações" },
-  { href: "/loja/demo", label: "Ver loja" },
-];
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { store } = await getDashboardData();
+  const links = [
+    { href: "/dashboard", label: "Resumo" },
+    { href: "/dashboard/produtos", label: "Produtos" },
+    { href: "/dashboard/configuracoes", label: "Configuracoes" },
+    { href: store ? `/loja/${store.slug}` : "/loja/demo", label: "Ver loja" },
+  ];
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-[#fbfaf7] text-zinc-950">
       <header className="border-b border-zinc-200 bg-white">
@@ -18,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               className="cursor-pointer text-base font-bold text-zinc-950 transition hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
               href="/"
             >
-              Catálogo Local
+              Catalogo Local
             </Link>
             <span className="rounded-lg bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800">
               Demo

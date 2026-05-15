@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { DashboardStore } from "../dashboard-data";
 import { createBrowserSupabaseClient } from "../../lib/supabase/browser";
@@ -19,7 +19,6 @@ type StoreForm = {
   name: string;
   businessType: string;
   description: string;
-  slug: string;
   whatsapp: string;
   whatsappMessageTemplate: string;
   isActive: boolean;
@@ -29,7 +28,6 @@ const emptyForm: StoreForm = {
   name: "",
   businessType: "",
   description: "",
-  slug: "",
   whatsapp: "",
   whatsappMessageTemplate: defaultWhatsappMessage,
   isActive: true,
@@ -47,6 +45,16 @@ function slugify(value: string) {
 
 function onlyNumbers(value: string) {
   return value.replace(/\D/g, "");
+}
+
+function getSiteUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/+$/g, "");
+  }
+
+  return "http://localhost:3000";
 }
 
 function getFileExtension(file: File) {
@@ -83,7 +91,6 @@ function storeToForm(store: DashboardStore | null): StoreForm {
     name: store.name,
     businessType: store.business_type ?? "",
     description: store.description ?? "",
-    slug: store.slug,
     whatsapp: store.whatsapp ?? "",
     whatsappMessageTemplate: store.whatsapp_message_template ?? defaultWhatsappMessage,
     isActive: store.is_active,
@@ -102,16 +109,6 @@ function getInitials(name: string) {
     .map((word) => word[0])
     .join("")
     .toUpperCase();
-}
-
-function isDuplicateSlugError(message?: string, code?: string) {
-  const normalizedMessage = message?.toLowerCase() ?? "";
-
-  return (
-    code === "23505" ||
-    normalizedMessage.includes("stores_slug_key") ||
-    normalizedMessage.includes("duplicate key")
-  );
 }
 
 export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
@@ -133,12 +130,24 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     };
   }, [logoPreviewUrl]);
 
-  const normalizedSlug = useMemo(() => slugify(form.slug), [form.slug]);
-  const publicLinkPreview = `/loja/${normalizedSlug || "minha-loja"}`;
+  const publicUrl = `${getSiteUrl()}/loja/${store?.slug ?? "demo"}`;
   const logoInitials = getInitials(form.name || store?.name || "");
 
   function updateForm(nextFields: Partial<StoreForm>) {
     setForm((currentForm) => ({ ...currentForm, ...nextFields }));
+  }
+
+  async function copyPublicUrl() {
+    if (!store) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      setFeedback({ type: "success", text: "Link publico copiado." });
+    } catch {
+      setFeedback({ type: "error", text: "Nao foi possivel copiar o link publico." });
+    }
   }
 
   function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
@@ -185,15 +194,9 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     }
 
     const cleanName = form.name.trim();
-    const cleanSlug = slugify(form.slug);
 
     if (!cleanName) {
       setFeedback({ type: "error", text: "Informe o nome da loja." });
-      return;
-    }
-
-    if (!cleanSlug) {
-      setFeedback({ type: "error", text: "Informe um slug publico valido." });
       return;
     }
 
@@ -278,7 +281,6 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         name: cleanName,
         business_type: form.businessType.trim() || null,
         description: form.description.trim() || null,
-        slug: cleanSlug,
         whatsapp: onlyNumbers(form.whatsapp) || null,
         whatsapp_message_template:
           form.whatsappMessageTemplate.trim() || defaultWhatsappMessage,
@@ -295,11 +297,6 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     setIsSubmitting(false);
 
     if (error || !data) {
-      if (isDuplicateSlugError(error?.message, error?.code)) {
-        setFeedback({ type: "error", text: "Esse endereco ja esta em uso. Escolha outro slug." });
-        return;
-      }
-
       setFeedback({
         type: "error",
         text: didUploadNewLogo
@@ -401,30 +398,53 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <h2 className="text-lg font-bold text-zinc-950">Link publico</h2>
           <p className="mt-1 text-sm leading-6 text-zinc-600">
-            Esse e o endereco que pode ser compartilhado com clientes.
+            Esse endereco e controlado pelo sistema para evitar links quebrados depois que
+            ele for compartilhado.
           </p>
 
-          <label className="mt-4 block text-sm font-bold text-zinc-800" htmlFor="slug">
-            Slug publico
-            <input
-              className="mt-2 h-12 w-full rounded-lg border border-zinc-300 px-4 font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
-              disabled={!store || isSubmitting}
-              id="slug"
-              onBlur={() => updateForm({ slug: normalizedSlug })}
-              onChange={(event) => updateForm({ slug: event.target.value })}
-              placeholder="minha-loja"
-              type="text"
-              value={form.slug}
-            />
-          </label>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-bold text-zinc-800" htmlFor="slug">
+              Slug publico
+              <input
+                className="mt-2 h-12 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 font-normal text-zinc-600 outline-none"
+                id="slug"
+                readOnly
+                type="text"
+                value={store?.slug ?? ""}
+              />
+            </label>
+          </div>
 
           <div className="mt-4 rounded-lg border border-zinc-200 bg-stone-50 p-3">
             <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">
-              Previa do link
+              Link publico completo
             </p>
-            <p className="mt-1 break-all text-sm font-bold text-zinc-950">
-              {publicLinkPreview}
-            </p>
+            <a
+              className="mt-1 block break-all text-sm font-bold text-teal-800 underline-offset-2 transition hover:underline"
+              href={publicUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {publicUrl}
+            </a>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <button
+                className="h-10 cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 text-sm font-bold text-zinc-900 transition hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 disabled:cursor-not-allowed disabled:text-zinc-400"
+                disabled={!store}
+                onClick={copyPublicUrl}
+                type="button"
+              >
+                Copiar link
+              </button>
+              <a
+                className="inline-flex h-10 cursor-pointer items-center justify-center rounded-lg bg-teal-800 px-4 text-sm font-bold text-white transition hover:bg-teal-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
+                href={publicUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Ver loja
+              </a>
+            </div>
           </div>
         </section>
 
